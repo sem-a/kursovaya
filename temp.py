@@ -10,12 +10,12 @@ import time
 import random as r
 import math as m
 import matplotlib.pyplot as plt
+from progress.bar import IncrementalBar
 
 
 start_time = time.perf_counter()
-
+matrix_size =  int(input('Введите размер матрицы: '))
 coord_point_array = []
-
 
 def func_1(x, y):
     """ функция 1 """
@@ -33,7 +33,6 @@ def calculation_cell_size(X, Y, matrix_size):
     cell_size = [((np.max(X) - np.min(X)) / (matrix_size - 5)), ((np.max(Y) - np.min(Y)) / (matrix_size - 5))]
     return np.max(cell_size)
 
-
 def error_len(x, y, grid):
     """ ошибка размера матрицы """
     if(x > (len(grid) - 1) or y > (len(grid) - 1) or x < 0 or y < 0):
@@ -41,16 +40,6 @@ def error_len(x, y, grid):
         return False
     else:
         return True
-
-
-def print_matrix(matrix):
-    """ печать матрицы  """
-    if (matrix != 0):
-        for i in range(len(matrix)):
-            print(matrix[i])
-    else:
-        print('Ошибка чтения матрицы')
-
 
 def save_coord_point(coord_point):
     """ сохранение точек матрицы в массив """
@@ -101,8 +90,10 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     segment = [0,10]
     h = 0.001
     n = int( (segment[1] - segment[0]) / h )
-    start_point = calc_start_point(500, [[-2.6, 2.6], [-4.3, 4.3,]])
+    quantity_start_point = int(input('Количество стартовых точек: '))
+    start_point = calc_start_point(quantity_start_point, [[-2.6, 2.6], [-4.3, 4.3,]])
     mu = 0.1
+    progress_bar = IncrementalBar('Str', max = quantity_start_point)
 
     try:
         grid = [[[0, 0, 0, 0] for col in range(matrix_size)] for row in range(matrix_size)] # заполнение сетки нулями
@@ -135,7 +126,6 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
                     if(error_len(x_coor, y_coor, grid)):
                         if([x_temp, y_temp] != [x_coor, y_coor]):
                             save_coord_point([x_temp, y_temp]) # Сохранение точек в массив
-
                     else:
                         continue
 
@@ -146,12 +136,17 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
 
             #check_arr(coord_point_array, grid)
             comparison_point(coord_point_array, grid)
+            progress_bar.next()
 
+        progress_bar.finish()
         return grid
     except:
         print('Возникла непредвиденная ошибка!')
 
-
-print_matrix(create_grid(10, func_1, func_2))
-plt.show()
+matrix = create_grid(matrix_size, func_1, func_2)
+plt.savefig(f'{matrix_size}.png')
+my_file = open(f'{matrix_size}.txt', "w+")
+my_file.write(str(matrix))
+my_file.close()
 print('Время выполнения программы:', time.perf_counter() - start_time)
+plt.show()
