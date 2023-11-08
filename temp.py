@@ -6,16 +6,17 @@ import numba as nb
 import copy
 from progress.bar import IncrementalBar
 
+
 start_time = t.perf_counter()
 matrix_size = 10#int(input('Введите размер матрицы: '))
 coord_point_array = []
 repeat_points = []
 
-@nb.jit
+@nb.njit(cache=True)
 def func_1(x, y):
     """ функция 1 """
     return -x*(x**2 - 5) - y
-@nb.jit
+@nb.njit(cache=True)
 def func_2(x, y):
     """ функция 2 """
     return x
@@ -62,28 +63,52 @@ def comparison_point(arr, grid, cell_size):
             else:
                 point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
                 point_temp[k] = 1
-                repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                if len(repeat_points) != 0: 
+                    if point_temp in repeat_points:
+                        continue
+                    else:
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                else:
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
         elif(arr[i+1][1] > arr[i][1]):
             if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 3):
                 grid[arr[i][1]][arr[i][0]][k] = 3
             else:
                 point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
                 point_temp[k] = 3
-                repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                if len(repeat_points) != 0: 
+                    if point_temp in repeat_points:
+                        continue
+                    else:
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                else:
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
         if(arr[i+1][0] < arr[i][0]):
             if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 4):
                 grid[arr[i][1]][arr[i][0]][k] = 4
             else:
                 point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
                 point_temp[k] = 4
-                repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                if len(repeat_points) != 0: 
+                    if point_temp in repeat_points:
+                        continue
+                    else:
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                else:
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
         elif(arr[i+1][0] > arr[i][0]):
             if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 2):
                 grid[arr[i][1]][arr[i][0]][k] = 2
             else:
                 point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
                 point_temp[k] = 2
-                repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                if len(repeat_points) != 0: 
+                    if point_temp in repeat_points:
+                        continue
+                    else: 
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                else:
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
 
 def create_grid(matrix_size, func_1, func_2, cell_size=0):
     """ Принимает: размер матрицы, функция 1, функция 2, размер клетки(необязательно) """
@@ -91,10 +116,10 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     segment = [0, 10]
     h = 0.01
     n = int((segment[1] - segment[0]) / h)
-    quantity_start_point = 3#int(input('Количество стартовых точек: '))
+    quantity_start_point = 10#int(input('Количество стартовых точек: '))
     start_point = calc_start_point(quantity_start_point, [[-2.6, 2.6], [-4.3, 4.3]])
     mu = 0.1
-    #progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
+    progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
     try:
         grid = [[[0, 0, 0, 0] for col in range(matrix_size)] for row in range(matrix_size)] # заполнение матрицы нулями
         for j in range(len(start_point)):
@@ -126,8 +151,8 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
                 else: 
                     continue
             comparison_point(coord_point_array, grid, cell_size)
-            #progress_bar.next()            
-        #progress_bar.finish()
+            progress_bar.next()            
+        progress_bar.finish()
         return grid
     except ValueError:
         print(str(ValueError))
