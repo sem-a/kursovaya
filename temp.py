@@ -6,9 +6,8 @@ import numba as nb
 import copy
 from progress.bar import IncrementalBar
 
-
 start_time = t.perf_counter()
-matrix_size = 10#int(input('Введите размер матрицы: '))
+matrix_size = 100#int(input('Введите размер матрицы: '))
 coord_point_array = []
 repeat_points = []
 
@@ -48,7 +47,7 @@ def save_coord_point(coord_point):
 
 def comparison_point(arr, grid, cell_size):
     """ Заполнение точками: массив с точками, матрица """
-    for i in range(1, len(arr) - 1):
+    for i in nb.prange(1, len(arr) - 1):
         if(arr[i-1][1] < arr[i][1]):
             k = 0
         elif(arr[i-1][1] > arr[i][1]):
@@ -116,15 +115,15 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     segment = [0, 10]
     h = 0.01
     n = int((segment[1] - segment[0]) / h)
-    quantity_start_point = 10#int(input('Количество стартовых точек: '))
+    quantity_start_point = 100#int(input('Количество стартовых точек: '))
     start_point = calc_start_point(quantity_start_point, [[-2.6, 2.6], [-4.3, 4.3]])
     mu = 0.1
     progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
     try:
-        grid = [[[0, 0, 0, 0] for col in range(matrix_size)] for row in range(matrix_size)] # заполнение матрицы нулями
-        for j in range(len(start_point)):
+        grid = [[[0, 0, 0, 0] for col in nb.prange(matrix_size)] for row in nb.prange(matrix_size)] # заполнение матрицы нулями
+        for j in nb.prange(len(start_point)):
             point = [[], []] # массив содержащий решения X и Y
-            for i in range(n):
+            for i in nb.prange(n):
                 if(i == 0):
                     point[0].append(start_point[j][0] + func_1(start_point[j][0], start_point[j][1]) * h / mu)
                     point[1].append(start_point[j][1] + func_1(start_point[j][0], start_point[j][1]) * h / mu)
@@ -136,7 +135,7 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
             x_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # рассчет первых точек Х и У
             y_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # относительно центра матрицы
             """ Заполнение матрицы по траектории движения """
-            for i in range(2, n):
+            for i in nb.prange(2, n):
                 if(error_len(x_temp, y_temp, grid)):
                     x_coor = int( (matrix_size + 1) / 2 ) + int( point[0][i] / cell_size ) # следующие координаты 
                     y_coor = int( (matrix_size + 1) / 2 ) - int( point[1][i] / cell_size ) # X и Y
