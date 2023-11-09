@@ -5,9 +5,10 @@ import random as r
 import numba as nb
 import copy
 from progress.bar import IncrementalBar
+from numba.typed import List
 
 start_time = t.perf_counter()
-matrix_size = 100#int(input('Введите размер матрицы: '))
+matrix_size = 10#int(input('Введите размер матрицы: '))
 coord_point_array = []
 repeat_points = []
 
@@ -18,7 +19,7 @@ def func_1(x, y):
 @nb.njit(cache=True)
 def func_2(x, y):
     """ функция 2 """
-    return x
+    return x + 1.3
 
 def calc_start_point(quantity, segment):
     """ Расчет стартовой точки: количество, массив отрезка по Х и по У """
@@ -27,7 +28,20 @@ def calc_start_point(quantity, segment):
 
 def draw_grafic(X, Y):
     """ Построить график системы """
-    plt.plot(X, Y)
+    fig = plt.figure()
+    fig
+
+def draw_grid(cell_size):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    major_ticks = np.arange(-5, 5, 1)
+    minor_ticks = np.arange(-5, 5, cell_size)
+    ax.set_xticks(major_ticks)
+    ax.set_yticks(major_ticks)
+    ax.set_xticks(minor_ticks, minor=True)
+    ax.set_yticks(minor_ticks, minor=True)
+    ax.grid(which='major', alpha=0)
+    ax.grid(which='minor', alpha=0.2)
 
 def calc_cell_size(X, Y,  matrix_size):
     """ Рассчет размера клетки: массив точек по Х, массив точек по У, размер матрицы """
@@ -113,9 +127,9 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     """ Принимает: размер матрицы, функция 1, функция 2, размер клетки(необязательно) """
     """ Начальные условия """
     segment = [0, 10]
-    h = 0.01
+    h = 0.001
     n = int((segment[1] - segment[0]) / h)
-    quantity_start_point = 100#int(input('Количество стартовых точек: '))
+    quantity_start_point = 10#int(input('Количество стартовых точек: '))
     start_point = calc_start_point(quantity_start_point, [[-2.6, 2.6], [-4.3, 4.3]])
     mu = 0.1
     progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
@@ -132,6 +146,7 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
             draw_grafic(point[0], point[1])
             if(cell_size == 0):
                 cell_size = calc_cell_size(point[0], point[1], matrix_size)
+            draw_grid(cell_size)
             x_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # рассчет первых точек Х и У
             y_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # относительно центра матрицы
             """ Заполнение матрицы по траектории движения """
@@ -152,11 +167,12 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
             comparison_point(coord_point_array, grid, cell_size)
             progress_bar.next()            
         progress_bar.finish()
+        print("Размер клетки:", cell_size)
         return grid
     except ValueError:
         print(str(ValueError))
 matrix = create_grid(matrix_size, func_1, func_2)
-plt.savefig(f'{matrix_size}.png')
+plt.savefig(f'{matrix_size}.svg')
 my_file = open(f'{matrix_size}.txt', "w+")
 for string in matrix:
     my_file.write(str(string) + '\n')
