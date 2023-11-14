@@ -8,7 +8,7 @@ from progress.bar import IncrementalBar
 from numba.typed import List
 
 start_time = t.perf_counter()
-matrix_size = 10#int(input('Введите размер матрицы: '))
+matrix_size = 500#int(input('Введите размер матрицы: '))
 coord_point_array = []
 repeat_points = []
 
@@ -28,20 +28,16 @@ def calc_start_point(quantity, segment):
 
 def draw_grafic(X, Y):
     """ Построить график системы """
-    fig = plt.figure()
-    fig
+    plt.plot(X, Y)
 
-def draw_grid(cell_size):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    major_ticks = np.arange(-5, 5, 1)
-    minor_ticks = np.arange(-5, 5, cell_size)
-    ax.set_xticks(major_ticks)
-    ax.set_yticks(major_ticks)
-    ax.set_xticks(minor_ticks, minor=True)
-    ax.set_yticks(minor_ticks, minor=True)
-    ax.grid(which='major', alpha=0)
-    ax.grid(which='minor', alpha=0.2)
+def draw_repeat_points(cell_size):
+     """ Построить повторяющиеся точки """
+     for el in repeat_points: 
+            x_1 = (el[1] - int( (matrix_size) / 2)) * cell_size
+            x = [x_1, x_1 + cell_size, x_1 + cell_size, x_1, x_1]
+            y_1 = -(el[0] - int( (matrix_size) / 2)) * cell_size
+            y = [y_1, y_1, y_1 + cell_size, y_1 + cell_size, y_1]
+            plt.plot(x, y, 'red', linewidth=0.02)
 
 def calc_cell_size(X, Y,  matrix_size):
     """ Рассчет размера клетки: массив точек по Х, массив точек по У, размер матрицы """
@@ -129,7 +125,7 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     segment = [0, 10]
     h = 0.001
     n = int((segment[1] - segment[0]) / h)
-    quantity_start_point = 10#int(input('Количество стартовых точек: '))
+    quantity_start_point = 50#int(input('Количество стартовых точек: '))
     start_point = calc_start_point(quantity_start_point, [[-2.6, 2.6], [-4.3, 4.3]])
     mu = 0.1
     progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
@@ -146,7 +142,6 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
             draw_grafic(point[0], point[1])
             if(cell_size == 0):
                 cell_size = calc_cell_size(point[0], point[1], matrix_size)
-            draw_grid(cell_size)
             x_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # рассчет первых точек Х и У
             y_temp = int( (matrix_size - 1) / 2 ) + int( point[0][0] / cell_size ) # относительно центра матрицы
             """ Заполнение матрицы по траектории движения """
@@ -165,7 +160,8 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
                 else: 
                     continue
             comparison_point(coord_point_array, grid, cell_size)
-            progress_bar.next()            
+            progress_bar.next()
+        draw_repeat_points(cell_size)            
         progress_bar.finish()
         print("Размер клетки:", cell_size)
         return grid
