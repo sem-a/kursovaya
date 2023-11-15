@@ -8,7 +8,7 @@ from progress.bar import IncrementalBar
 from numba.typed import List
 
 start_time = t.perf_counter()
-matrix_size = 500#int(input('Введите размер матрицы: '))
+matrix_size = 10#int(input('Введите размер матрицы: '))
 coord_point_array = []
 repeat_points = []
 
@@ -28,16 +28,16 @@ def calc_start_point(quantity, segment):
 
 def draw_grafic(X, Y):
     """ Построить график системы """
-    plt.plot(X, Y)
+    plt.plot(X, Y, linewidth=0.2)
 
 def draw_repeat_points(cell_size):
-     """ Построить повторяющиеся точки """
-     for el in repeat_points: 
-            x_1 = (el[1] - int( (matrix_size) / 2)) * cell_size
-            x = [x_1, x_1 + cell_size, x_1 + cell_size, x_1, x_1]
-            y_1 = -(el[0] - int( (matrix_size) / 2)) * cell_size
-            y = [y_1, y_1, y_1 + cell_size, y_1 + cell_size, y_1]
-            plt.plot(x, y, 'red', linewidth=0.02)
+    """ Построить повторяющиеся точки """
+    for el in repeat_points: 
+        x_1 = (el[1] - int( (matrix_size) / 2)) * cell_size
+        x = [x_1, x_1 + cell_size, x_1 + cell_size, x_1, x_1]
+        y_1 = -(el[0] - int( (matrix_size) / 2)) * cell_size
+        y = [y_1, y_1, y_1 + cell_size, y_1 + cell_size, y_1]
+        plt.plot(x, y, 'red', linewidth=0.02)
 
 def calc_cell_size(X, Y,  matrix_size):
     """ Рассчет размера клетки: массив точек по Х, массив точек по У, размер матрицы """
@@ -67,57 +67,61 @@ def comparison_point(arr, grid, cell_size):
         elif(arr[i-1][0] > arr[i][0]):
             k = 1
         if(arr[i+1][1] < arr[i][1]):
-            if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 1):
-                grid[arr[i][1]][arr[i][0]][k] = 1
+            if(grid[arr[i][1]][arr[i][0]][0][k] == 0 or grid[arr[i][1]][arr[i][0]][0][k] == 1):
+                grid[arr[i][1]][arr[i][0]][0][k] = 1
+                grid[arr[i][1]][arr[i][0]][1] += 1
             else:
-                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
+                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]][0])
                 point_temp[k] = 1
                 if len(repeat_points) != 0: 
                     if point_temp in repeat_points:
                         continue
                     else:
-                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
                 else:
-                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
         elif(arr[i+1][1] > arr[i][1]):
-            if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 3):
-                grid[arr[i][1]][arr[i][0]][k] = 3
+            if(grid[arr[i][1]][arr[i][0]][0][k] == 0 or grid[arr[i][1]][arr[i][0]][0][k] == 3):
+                grid[arr[i][1]][arr[i][0]][0][k] = 3
+                grid[arr[i][1]][arr[i][0]][1] += 1
             else:
-                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
+                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]][0])
                 point_temp[k] = 3
                 if len(repeat_points) != 0: 
                     if point_temp in repeat_points:
                         continue
                     else:
-                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
                 else:
-                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
         if(arr[i+1][0] < arr[i][0]):
-            if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 4):
-                grid[arr[i][1]][arr[i][0]][k] = 4
+            if(grid[arr[i][1]][arr[i][0]][0][k] == 0 or grid[arr[i][1]][arr[i][0]][0][k] == 4):
+                grid[arr[i][1]][arr[i][0]][0][k] = 4
+                grid[arr[i][1]][arr[i][0]][1] += 1
             else:
-                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
+                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]][0])
                 point_temp[k] = 4
                 if len(repeat_points) != 0: 
                     if point_temp in repeat_points:
                         continue
                     else:
-                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
                 else:
-                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
         elif(arr[i+1][0] > arr[i][0]):
-            if(grid[arr[i][1]][arr[i][0]][k] == 0 or grid[arr[i][1]][arr[i][0]][k] == 2):
-                grid[arr[i][1]][arr[i][0]][k] = 2
+            if(grid[arr[i][1]][arr[i][0]][0][k] == 0 or grid[arr[i][1]][arr[i][0]][0][k] == 2):
+                grid[arr[i][1]][arr[i][0]][0][k] = 2
+                grid[arr[i][1]][arr[i][0]][1] += 1
             else:
-                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]])
+                point_temp = copy.deepcopy(grid[arr[i][1]][arr[i][0]][0])
                 point_temp[k] = 2
                 if len(repeat_points) != 0: 
                     if point_temp in repeat_points:
                         continue
                     else: 
-                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                        repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
                 else:
-                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]], point_temp])
+                    repeat_points.append([arr[i][1], arr[i][0], grid[arr[i][1]][arr[i][0]][0], point_temp])
 
 def create_grid(matrix_size, func_1, func_2, cell_size=0):
     """ Принимает: размер матрицы, функция 1, функция 2, размер клетки(необязательно) """
@@ -130,7 +134,7 @@ def create_grid(matrix_size, func_1, func_2, cell_size=0):
     mu = 0.1
     progress_bar = IncrementalBar('Start Point', max = quantity_start_point)
     try:
-        grid = [[[0, 0, 0, 0] for col in nb.prange(matrix_size)] for row in nb.prange(matrix_size)] # заполнение матрицы нулями
+        grid = [[[[0, 0, 0, 0], 0] for col in nb.prange(matrix_size)] for row in nb.prange(matrix_size)] # заполнение матрицы нулями
         for j in nb.prange(len(start_point)):
             point = [[], []] # массив содержащий решения X и Y
             for i in nb.prange(n):
