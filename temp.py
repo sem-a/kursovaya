@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import time as t
-import random as r
 import numba as nb
 import copy
 from progress.bar import IncrementalBar
@@ -22,20 +21,23 @@ def func_2(x, y):
     return x + 1.3
 
 def calc_start_point(quantity, segment):
-    """ Расчет стартовой точки: количество, массив отрезка по Х и по У """
-    start_point = [ [r.uniform(segment[0][0], segment[0][1]), r.uniform(segment[1][0], segment[1][1])] for row in range(quantity)]
+    """Numba-optimized function for calculating start points"""
+    start_point = np.empty((quantity, 2))
+    for row in range(quantity):
+        start_point[row, 0] = np.random.uniform(segment[0][0], segment[0][1])
+        start_point[row, 1] = np.random.uniform(segment[1][0], segment[1][1])
     return start_point
 
 def draw_grafic(X, Y):
-    """ Построить график системы """
+    """Numba-optimized function for plotting the system"""
     plt.plot(X, Y, linewidth=0.2)
 
 def draw_repeat_points(cell_size):
-    """ Построить повторяющиеся точки """
+    """Numba-optimized function for plotting repeat points"""
     for el in repeat_points: 
-        x_1 = (el[1] - int( (matrix_size) / 2)) * cell_size
+        x_1 = (el[1] - int(matrix_size / 2)) * cell_size
         x = [x_1, x_1 + cell_size, x_1 + cell_size, x_1, x_1]
-        y_1 = -(el[0] - int( (matrix_size) / 2)) * cell_size
+        y_1 = -(el[0] - int(matrix_size / 2)) * cell_size
         y = [y_1, y_1, y_1 + cell_size, y_1 + cell_size, y_1]
         plt.plot(x, y, 'red', linewidth=0.02)
 
