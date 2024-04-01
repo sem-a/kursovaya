@@ -57,6 +57,29 @@ def method_euler(start_point, n, h, mu):
     return point
 
 @nb.njit(cache=True)
+def calc_start_point_of_cell(quantity, polygon, grid_size, cell_size):
+    """ Рассчет стартовых точек по центрам клеток """
+    x_min, x_max = polygon[0][0], polygon[0][1]
+    y_min, y_max = polygon[1][0], polygon[1][1]
+    start_point = np.empty( (quantity, 2) )
+    x_offset = 0
+    y_offset = 0
+    for i in nb.prange(quantity):
+        x = x_min + (cell_size / 2) + x_offset * cell_size
+        if (x_offset == grid_size - 1):
+            x_offset = 0
+            y_offset += 1
+        y = y_min + (cell_size / 2) + y_offset * cell_size
+        x_offset += 1
+        start_point[i, 0] = x
+        start_point[i, 1] = y
+        if (start_point[i, 0] > x_max and start_point[i, 1] > y_max):
+            return start_point
+    return start_point
+
+    
+
+@nb.njit(cache=True)
 def calc_start_point(quantity, polygon):
     """ Рассчет стартовых точек """
     x_min, x_max = polygon[0][0], polygon[0][1]
@@ -126,6 +149,7 @@ def calc_middle_iteration(grid, grid_size):
             if grid[row, col]['iteration'] != 0:
                 res = int(grid[row, col]['iteration'] / grid[row, col]['pathway'])
                 grid[row, col]['iteration'] = res
+                
 @nb.njit(cache=True)
 def update_grid_and_repeat_points(grid, point_coords, k, new_value, repeat_points, repeat_points_temp, pathway_counter):
     """ Обновляет grid и repeat_points с новым значением """
@@ -202,12 +226,14 @@ segment = np.array([0, 10])
 h = 0.001 # step
 mu = 0.1 # parameter
 n = int( (segment[1] - segment[0]) / h )
-quantity_start_point = 10000 # number of starting points
-start_point_polygon = np.array( [ [-2.6, 2.6], [-4.3, 4.3] ] ) # a segment for
+quantity_start_point = 2000 # number of starting points
+start_point_polygon = np.array( [ [-2.6, 2.6], [-4.7, 4.7] ] ) # a segment for
                                                                # selecting starting points
-start_point_arr = calc_start_point(quantity_start_point, start_point_polygon)
+# start_point_arr = calc_start_point(quantity_start_point, start_point_polygon)
 
-matrix_size = 10
+matrix_size = 100
+
+start_point_arr = calc_start_point_of_cell(quantity_start_point, start_point_polygon, matrix_size, cell_size=0.09)
 
 """***********************"""
 
@@ -230,7 +256,7 @@ repeat_points = np.zeros((0), dtype=dtype_for_repeat_points) # an array of point
 repeat_points_temp = np.zeros((1), dtype=dtype_for_repeat_points)
 """***************************************"""
 
-grid, point, coord_point_arr, repeat_points, cell_size = create_grid(grid, repeat_points, matrix_size, repeat_points_temp)
+grid, point, coord_point_arr, repeat_points, cell_size = create_grid(grid, repeat_points, matrix_size, repeat_points_temp, cell_size=0.09)
 
 
 my_file = open(f'{matrix_size}.txt', "w+")
@@ -247,6 +273,7 @@ end_time = t.time()
 elapsed_time = end_time - start_time
 print(f"Время выполнения программы: {elapsed_time} секунд")
 print(f"Размер клетки: {cell_size}")
+
 
 
 draw_grid_for_grafic(cell_size, start_point_polygon)
