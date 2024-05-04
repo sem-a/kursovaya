@@ -14,6 +14,8 @@ def f_2(x, y):
 def draw_grafic(point):
     X = point[0]
     Y = point[1]
+    plt.xlabel('x')
+    plt.ylabel('y')
     plt.plot(X, Y)
 
 def draw_grid():
@@ -223,7 +225,7 @@ n = int( (segment[1] - segment[0]) / h )
 
 start_point_arr = np.array( [[1, 1]] )
 
-cell_size = 0.09 # размер клетки
+cell_size = 1.02 # размер клетки
 
 solution = method_euler(start_point_arr[0], n, h, mu)
 
@@ -233,7 +235,7 @@ start_point_arr = calc_start_point(start_point_polygon, matrix_size, cell_size)
 
 dtype_for_matrix = np.dtype( [      # Тип для
     ('array', np.int16, (4)),       # матрицы 
-    ('iteration', np.int16),
+    ('iteration', np.int32),
     ('pathway', np.int16)
 ] )
 
@@ -253,13 +255,13 @@ repeat_points_temp = np.zeros((1), dtype=dtype_for_repeat_points)
 grid, repeat_points = create_grid(grid, repeat_points, matrix_size, repeat_points_temp, cell_size, start_point_arr, dtype_for_repeat_points)
 #draw_grid()
 
-# Сохранение данных grid в файл
+# # Сохранение данных grid в файл
 np.savetxt(f'{matrix_size}.txt', grid[::-1], fmt='%s')
 
-# Сохранение данных repeat_points в файл
-np.savetxt(f'repeat_of_{matrix_size}.txt', repeat_points[::-1], fmt='%s')
+# # Сохранение данных repeat_points в файл
+# np.savetxt(f'repeat_of_{matrix_size}.txt', repeat_points[::-1], fmt='%s')
 
-np.save(f'gridSize_{matrix_size}_cellSize_{cell_size}.npy', grid)
+#np.save(f'gridSize_{matrix_size}_cellSize_{cell_size}.npy', grid)
 
 # Запись данных repeat_points в файл
 with open(f'repeat_of_{matrix_size}.txt', "w") as my_file:
