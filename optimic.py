@@ -132,9 +132,9 @@ def update_grid_and_repeat_points(grid, point_coords, k, new_value, repeat_point
     cell = grid[y, x]
     if cell['array'][k] in (0, new_value):
         cell['array'][k] = new_value
-        cell['iteration'] += 1
-        if cell['pathway'] <= pathway_counter:
-            cell['pathway'] += 1
+        #cell['iteration'] += 1
+        #if cell['pathway'] <= pathway_counter:
+            #cell['pathway'] += 1
     else:
         point_temp = cell['array'].copy()
         point_temp[k] = new_value
@@ -208,7 +208,7 @@ def create_grid(grid, repeat_points, grid_size, repeat_points_temp, cell_size, s
     coord_point_arr = coord_point_arr[:point_count]
     
     # Вычисление среднего количества итераций
-    calc_middle_iteration(grid)
+    #calc_middle_iteration(grid)
     
     return grid, repeat_points
 
